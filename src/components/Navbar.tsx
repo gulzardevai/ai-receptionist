@@ -101,7 +101,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-base font-black tracking-tight text-slate-950">
-              ReceptionAI
+              CatchCall AI
             </span>
             <span className="rounded border border-slate-300 bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-700 shadow-2xs">
               Voice SaaS

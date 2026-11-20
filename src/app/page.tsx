@@ -410,7 +410,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500 font-medium">
-        <p>© 2026 ReceptionAI SaaS. All rights reserved.</p>
+        <p>© 2026 CatchCall AI. All rights reserved. • Contact: <a href="mailto:support@catchcall.tech" className="text-slate-800 hover:underline">support@catchcall.tech</a></p>
       </footer>
     </div>
   );
