@@ -10,7 +10,8 @@ export default function PricingPage() {
   const handleCheckout = async (plan: string) => {
     setLoadingPlan(plan);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/settings/whop-checkout?plan=${plan}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://ai-receptionist-backend-85ls.onrender.com/api/v1";
+      const res = await fetch(`${apiUrl}/settings/whop-checkout?plan=${plan}`);
       if (res.ok) {
         const data = await res.json();
         if (data.checkout_url) {
@@ -18,9 +19,16 @@ export default function PricingPage() {
           return;
         }
       }
-      window.location.href = `/wizard?plan=${plan}`;
+      // Direct checkout fallback
+      const directUrl = plan === "pro" 
+        ? "https://whop.com/checkout/plan_kf3AzbjKAvKjq" 
+        : "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      window.location.href = directUrl;
     } catch (err) {
-      window.location.href = `/wizard?plan=${plan}`;
+      const directUrl = plan === "pro" 
+        ? "https://whop.com/checkout/plan_kf3AzbjKAvKjq" 
+        : "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      window.location.href = directUrl;
     } finally {
       setLoadingPlan(null);
     }
