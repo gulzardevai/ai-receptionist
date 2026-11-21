@@ -36,7 +36,7 @@ export default function GoLivePage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requireSubscription={true}>
       <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar />
 

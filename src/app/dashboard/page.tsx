@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import { 
   PhoneCall, CalendarCheck, DollarSign, Clock, 
@@ -43,8 +44,27 @@ export default function DashboardPage() {
 
   const [calls, setCalls] = useState<CallRecord[]>([]);
   const [expandedCallId, setExpandedCallId] = useState<string | null>(null);
+  const [hasSubscription, setHasSubscription] = useState<boolean>(true);
 
   useEffect(() => {
+    async function checkSub() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const { data: subs } = await supabase
+            .from("subscriptions")
+            .select("status")
+            .eq("status", "active")
+            .limit(1);
+          if (!subs || subs.length === 0) {
+            setHasSubscription(false);
+          }
+        }
+      } catch (e) {
+        console.error("Sub check error:", e);
+      }
+    }
+    checkSub();
     fetch("http://localhost:8000/api/v1/dashboard/stats")
       .then(res => res.json())
       .then(data => setStats(data))
@@ -64,6 +84,25 @@ export default function DashboardPage() {
         <Navbar />
 
         <main className="max-w-7xl mx-auto px-6 py-10 w-full space-y-8">
+        {!hasSubscription && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4.5 rounded-2xl bg-amber-50 border border-amber-200 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-xs">
+                <ShieldAlert className="h-5 w-5" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-amber-950">Subscription Inactive — AI Receptionist Paused</p>
+                <p className="text-[11px] text-amber-800">Your live voice agent is paused. Activate a plan to answer customer calls and connect Google Calendar.</p>
+              </div>
+            </div>
+            <Link
+              href="/pricing"
+              className="shrink-0 rounded-xl bg-amber-950 hover:bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:scale-[1.02]"
+            >
+              Activate Plan ($149/mo)
+            </Link>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">Contractor Overview</h1>
