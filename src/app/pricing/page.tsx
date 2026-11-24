@@ -20,14 +20,20 @@ export default function PricingPage() {
         }
       }
       // Direct checkout fallback
-      const directUrl = plan === "pro" 
-        ? "https://whop.com/checkout/plan_kf3AzbjKAvKjq" 
-        : "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      let directUrl = "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      if (plan === "pro") {
+        directUrl = "https://whop.com/checkout/plan_kf3AzbjKAvKjq";
+      } else if (plan === "basic") {
+        directUrl = process.env.NEXT_PUBLIC_WHOP_BASIC_URL || "https://whop.com/checkout/plan_VGoqylQUrNvwI";
+      }
       window.location.href = directUrl;
     } catch (err) {
-      const directUrl = plan === "pro" 
-        ? "https://whop.com/checkout/plan_kf3AzbjKAvKjq" 
-        : "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      let directUrl = "https://whop.com/checkout/plan_gJp5agICmK3mE";
+      if (plan === "pro") {
+        directUrl = "https://whop.com/checkout/plan_kf3AzbjKAvKjq";
+      } else if (plan === "basic") {
+        directUrl = process.env.NEXT_PUBLIC_WHOP_BASIC_URL || "https://whop.com/checkout/plan_VGoqylQUrNvwI";
+      }
       window.location.href = directUrl;
     } finally {
       setLoadingPlan(null);
@@ -51,9 +57,69 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Basic Plan */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-slate-900">Basic Plan</h3>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">Solo Van</span>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">Perfect for independent solo contractors and handymen.</p>
+              
+              <div className="mt-6 flex items-baseline">
+                <span className="text-4xl font-extrabold text-slate-900">$99</span>
+                <span className="ml-1.5 text-xs text-slate-500">/ month</span>
+              </div>
+
+              <div className="mt-6 border-t border-slate-100 pt-6">
+                <ul className="space-y-3 text-xs text-slate-600">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span><strong>150 minutes</strong> included per month</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Dedicated local phone line</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>24/7 AI call answering in 2 rings</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Google Calendar appointment sync</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Instant email summaries & alerts</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleCheckout("basic")}
+              disabled={loadingPlan !== null}
+              className="mt-8 w-full flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 text-xs font-semibold transition"
+            >
+              {loadingPlan === "basic" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <span>Subscribe to Basic</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
+
           {/* Starter Plan */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm flex flex-col justify-between">
+          <div className="relative rounded-2xl border-2 border-slate-900 bg-white p-7 shadow-lg hover:shadow-xl transition flex flex-col justify-between">
+            <div className="absolute -top-3 right-6 rounded-full bg-slate-900 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              Most Popular
+            </div>
+
             <div>
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold text-slate-900">Starter Plan</h3>
@@ -95,7 +161,7 @@ export default function PricingPage() {
             <button
               onClick={() => handleCheckout("starter")}
               disabled={loadingPlan !== null}
-              className="mt-8 w-full flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 text-xs font-semibold transition"
+              className="mt-8 w-full flex items-center justify-center gap-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white py-3 text-xs font-semibold shadow-sm transition"
             >
               {loadingPlan === "starter" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -109,15 +175,11 @@ export default function PricingPage() {
           </div>
 
           {/* Pro Plan */}
-          <div className="relative rounded-2xl border-2 border-slate-900 bg-white p-8 shadow-md flex flex-col justify-between">
-            <div className="absolute -top-3 right-6 rounded-full bg-slate-900 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              Recommended
-            </div>
-
+          <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs hover:shadow-md transition flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-bold text-slate-900">Pro Plan</h3>
-                <span className="rounded-full bg-slate-900 text-white px-2.5 py-0.5 text-xs font-semibold">Multi-Crew</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">Multi-Crew</span>
               </div>
               <p className="mt-2 text-xs text-slate-500">For high-call volume businesses and multi-truck fleets.</p>
               
@@ -155,7 +217,7 @@ export default function PricingPage() {
             <button
               onClick={() => handleCheckout("pro")}
               disabled={loadingPlan !== null}
-              className="mt-8 w-full flex items-center justify-center gap-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white py-3 text-xs font-semibold shadow-sm transition"
+              className="mt-8 w-full flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-900 py-3 text-xs font-semibold transition"
             >
               {loadingPlan === "pro" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

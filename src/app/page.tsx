@@ -308,9 +308,59 @@ export default function Home() {
             One single saved HVAC or plumbing repair call pays for the entire monthly plan.
           </p>
 
-          <div className="mt-14 grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="mt-14 grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Basic Plan Card */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between text-left">
+              <div>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-slate-950">Basic Plan</h3>
+                  <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Solo Van</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">For independent solo operators & handymen.</p>
+                
+                <div className="mt-6 flex items-baseline">
+                  <span className="text-4xl font-black tracking-tight text-slate-950">$99</span>
+                  <span className="ml-1.5 text-xs text-slate-500 font-bold">/ month</span>
+                </div>
+
+                <ul className="mt-6 space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-6 font-medium">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span><strong>150 minutes</strong> included per month</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Dedicated local phone line</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>24/7 AI call answering in 2 rings</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Google Calendar appointment sync</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span>Instant email summaries & alerts</span>
+                  </li>
+                </ul>
+              </div>
+
+              <Link
+                href="/pricing"
+                className="mt-8 block text-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 py-3 text-xs font-bold text-slate-900 transition shadow-2xs"
+              >
+                Choose Basic Plan
+              </Link>
+            </div>
+
             {/* Starter Plan Card */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between text-left">
+            <div className="relative rounded-3xl border-2 border-slate-900 bg-white p-7 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between text-left">
+              <div className="absolute -top-3.5 right-6 rounded-full bg-slate-900 px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
+                Most Popular
+              </div>
+
               <div>
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold text-slate-950">Starter Plan</h3>
@@ -349,22 +399,18 @@ export default function Home() {
 
               <Link
                 href="/pricing"
-                className="mt-8 block text-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 py-3 text-xs font-bold text-slate-900 transition shadow-2xs"
+                className="mt-8 block text-center rounded-xl bg-slate-900 hover:bg-slate-800 py-3 text-xs font-bold text-white shadow-md transition"
               >
                 Choose Starter Plan
               </Link>
             </div>
 
             {/* Pro Plan Card */}
-            <div className="relative rounded-3xl border-2 border-slate-950 bg-white p-8 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between text-left">
-              <div className="absolute -top-3.5 right-6 rounded-full bg-slate-950 px-3.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
-                Most Popular
-              </div>
-
+            <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between text-left">
               <div>
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold text-slate-950">Pro Plan</h3>
-                  <span className="rounded-full bg-slate-900 text-white px-2.5 py-0.5 text-[11px] font-bold">Multi-Crew</span>
+                  <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Multi-Crew</span>
                 </div>
                 <p className="mt-1 text-xs text-slate-500">For established contractors handling 30+ calls daily.</p>
                 
@@ -399,7 +445,7 @@ export default function Home() {
 
               <Link
                 href="/pricing"
-                className="mt-8 block text-center rounded-xl bg-slate-950 hover:bg-slate-800 py-3 text-xs font-bold text-white shadow-md transition"
+                className="mt-8 block text-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 py-3 text-xs font-bold text-slate-900 transition shadow-2xs"
               >
                 Choose Pro Plan
               </Link>
