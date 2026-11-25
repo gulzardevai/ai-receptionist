@@ -94,10 +94,10 @@ const DEFAULT_CALLS: CallRecord[] = [
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
-    calls_answered: 42,
-    jobs_booked: 18,
-    revenue_recovered: 6300,
-    minutes_used: 124,
+    calls_answered: 4,
+    jobs_booked: 4,
+    revenue_recovered: 1400,
+    minutes_used: 8,
     minutes_included: 300
   });
 
