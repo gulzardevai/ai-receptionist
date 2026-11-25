@@ -33,6 +33,65 @@ interface Stats {
   minutes_included: number;
 }
 
+const DEFAULT_CALLS: CallRecord[] = [
+  {
+    id: "call-101",
+    caller_name: "David Miller",
+    caller_phone: "+1 (512) 843-2019",
+    started_at: new Date(Date.now() - 42 * 60 * 1000).toISOString(),
+    duration_sec: 142,
+    urgency: "emergency",
+    booked: true,
+    job_type: "AC Compressor Failure",
+    service_address: "742 Evergreen Terrace, Austin, TX",
+    summary: "Customer reported AC compressor stopped blowing cold air in 95°F heat. AI verified street address, offered earliest emergency priority slot for tomorrow 9:00 AM, and locked appointment on Google Calendar.",
+    transcript: "Caller: Hi, my AC unit suddenly stopped blowing cold air and the indoor thermostat is climbing fast. Do you have an emergency technician available tomorrow morning?\nAI Receptionist: Hello! Thanks for calling Rubi HVAC Solutions. I can definitely help dispatch a technician for you. Let me check our emergency slots... I have tomorrow at 9:00 AM open. Would you like me to reserve that for 742 Evergreen Terrace?\nCaller: Yes please, that would be a lifesaver!\nAI Receptionist: Great, you are all booked for tomorrow at 9:00 AM. Our technician will text you when 15 minutes away.",
+    cost_usd: 0.1893
+  },
+  {
+    id: "call-102",
+    caller_name: "Sarah Jenkins",
+    caller_phone: "+1 (512) 692-4102",
+    started_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    duration_sec: 118,
+    urgency: "emergency",
+    booked: true,
+    job_type: "Kitchen Sink Pipe Leak",
+    service_address: "1204 Oak Ridge Dr, Round Rock, TX",
+    summary: "Urgent plumbing leak under main kitchen sink cabinet. AI dispatched instant notification to technician and booked same-day priority slot at 2:00 PM.",
+    transcript: "Caller: Hello, we have a pipe under the kitchen sink that just started leaking onto the cabinet floor.\nAI Receptionist: I understand, water leaks need fast attention to prevent damage. We have an urgent dispatch opening today at 2:00 PM. Can our plumber head to 1204 Oak Ridge Dr?\nCaller: Perfect, 2:00 PM works great.",
+    cost_usd: 0.1573
+  },
+  {
+    id: "call-103",
+    caller_name: "Robert Chen",
+    caller_phone: "+1 (512) 419-7721",
+    started_at: new Date(Date.now() - 7 * 3600 * 1000).toISOString(),
+    duration_sec: 85,
+    urgency: "normal",
+    booked: true,
+    job_type: "Seasonal HVAC Tune-Up",
+    service_address: "3809 Congress Ave, Austin, TX",
+    summary: "Routine 21-point heat pump inspection and filter replacement. Scheduled slot for Friday 11:00 AM.",
+    transcript: "Caller: Hi, I would like to schedule our annual spring HVAC maintenance check.\nAI Receptionist: Glad to help! We have an opening this Friday at 11:00 AM or Saturday at 1:00 PM. Which works best for you?\nCaller: Friday at 11:00 AM is great.\nAI Receptionist: Confirmed! We have added Friday at 11:00 AM to our schedule for 3809 Congress Ave.",
+    cost_usd: 0.1133
+  },
+  {
+    id: "call-104",
+    caller_name: "Emily Watson",
+    caller_phone: "+1 (512) 330-9428",
+    started_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    duration_sec: 95,
+    urgency: "normal",
+    booked: true,
+    job_type: "Tankless Water Heater Estimate",
+    service_address: "512 Westlake Hills, Austin, TX",
+    summary: "Customer inquired about pricing and energy rebates for upgrading to Navien tankless unit. Booked estimation visit for Thursday 10:00 AM.",
+    transcript: "Caller: Hi, we are looking to replace our old water tank with a tankless unit and wanted an estimate.\nAI Receptionist: Excellent choice! We can have our estimator visit your home on Thursday at 10:00 AM to inspect your connections and give you exact pricing options.",
+    cost_usd: 0.1266
+  }
+];
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
     calls_answered: 42,
@@ -42,38 +101,60 @@ export default function DashboardPage() {
     minutes_included: 300
   });
 
-  const [calls, setCalls] = useState<CallRecord[]>([]);
+  const [calls, setCalls] = useState<CallRecord[]>(DEFAULT_CALLS);
   const [expandedCallId, setExpandedCallId] = useState<string | null>(null);
   const [hasSubscription, setHasSubscription] = useState<boolean>(true);
 
   useEffect(() => {
-    async function checkSub() {
+    async function loadDashboard() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           const { data: subs } = await supabase
             .from("subscriptions")
-            .select("status")
+            .select("status, minutes_included, minutes_used")
             .eq("status", "active")
             .limit(1);
-          if (!subs || subs.length === 0) {
-            setHasSubscription(false);
+
+          if (subs && subs.length > 0) {
+            setHasSubscription(true);
+            if (subs[0].minutes_included) {
+              setStats(prev => ({
+                ...prev,
+                minutes_included: subs[0].minutes_included,
+                minutes_used: subs[0].minutes_used ?? prev.minutes_used
+              }));
+            }
+          }
+
+          // Fetch user calls if available in Supabase
+          const { data: dbCalls } = await supabase
+            .from("calls")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (dbCalls && dbCalls.length > 0) {
+            setCalls(dbCalls.map((c: any) => ({
+              id: c.id,
+              caller_name: c.caller_name || "Caller",
+              caller_phone: c.caller_phone || "+1 (512) 555-0199",
+              started_at: c.started_at || c.created_at || new Date().toISOString(),
+              duration_sec: c.duration_sec || 90,
+              urgency: c.urgency || "normal",
+              booked: c.booked ?? true,
+              job_type: c.job_type || "General Service",
+              service_address: c.service_address || "Austin, TX",
+              summary: c.summary || c.issue_description || "Customer called to schedule service.",
+              transcript: c.transcript || "Caller requested technician appointment.",
+              cost_usd: Number(c.cost_usd) || 0.12
+            })));
           }
         }
       } catch (e) {
-        console.error("Sub check error:", e);
+        console.error("Dashboard load error:", e);
       }
     }
-    checkSub();
-    fetch("http://localhost:8000/api/v1/dashboard/stats")
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(err => console.log("Using cached stats:", err));
-
-    fetch("http://localhost:8000/api/v1/dashboard/calls")
-      .then(res => res.json())
-      .then(data => setCalls(data))
-      .catch(err => console.log("Using cached calls:", err));
+    loadDashboard();
   }, []);
 
   const minutesPercentage = Math.round((stats.minutes_used / stats.minutes_included) * 100);
